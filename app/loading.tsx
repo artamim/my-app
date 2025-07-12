@@ -5,7 +5,6 @@ export default function Loading() {
       style={{
         width: "100vw",
         height: "100vh",
-        backgroundColor: "red",
         display: "flex", // Enable flexbox
         justifyContent: "center", // Center horizontally
         alignItems: "center", // Center vertically

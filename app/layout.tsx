@@ -1,9 +1,11 @@
 // app/layout.tsx
 import type { Metadata } from 'next';
 import './globals.css';
+import './layout.css'; // Import the new CSS file
 import { Suspense } from 'react';
 import { UserProvider } from './_lib/UserContext';
 import { headers } from 'next/headers';
+import Nav from './components/Nav'; // Import the Nav component
 
 export const metadata: Metadata = {
   title: 'Create Next App',
@@ -30,9 +32,12 @@ export default async function RootLayout({
     <html lang="en">
       <body>
         <UserProvider user={user}>
-          <Suspense fallback={<Loading />}>
-            <div>{children}</div>
-          </Suspense>
+          <Nav user={user} /> {/* Pass user to Nav component */}
+          <main className="main-content">
+            <Suspense fallback={<Loading />}>
+              <div>{children}</div>
+            </Suspense>
+          </main>
         </UserProvider>
       </body>
     </html>
@@ -40,19 +45,5 @@ export default async function RootLayout({
 }
 
 function Loading() {
-  return (
-    <div
-      style={{
-        width: '100vw',
-        height: '100vh',
-        backgroundColor: 'green',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        textAlign: 'center',
-      }}
-    >
-      Loading Layout...
-    </div>
-  );
+  return <div className="loading">Loading Layout...</div>;
 }
