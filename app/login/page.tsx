@@ -2,8 +2,8 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link'; // Import Link for navigation
-import '../auth.css'; // Corrected path to auth.css
+import Link from 'next/link';
+import '../auth.css';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -12,24 +12,40 @@ export default function Login() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const API_ENDPOINT = process.env.NEXT_PUBLIC_API_ENDPOINT; // Access the env variable
+    const API_ENDPOINT = process.env.NEXT_PUBLIC_API_ENDPOINT;
     if (!API_ENDPOINT) {
       setError('API endpoint not configured');
       return;
     }
 
+    console.log('API Endpoint:', API_ENDPOINT);
     const res = await fetch(`${API_ENDPOINT}/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password }),
+      credentials: 'include',
     });
 
+    console.log('Set-Cookie Headers:', res.headers.get('set-cookie'));
     if (res.ok) {
-      // Tokens are set as cookies by FastAPI, no need to store manually
       window.location.href = '/';
     } else {
-      const errorData = await res.json(); // Parse error details
-      setError(errorData.detail || 'Invalid credentials');
+      const errorData = await res.json();
+      let errorMessage = 'Invalid credentials';
+      
+      // Handle different error formats
+      if (errorData.detail) {
+        if (typeof errorData.detail === 'string') {
+          errorMessage = errorData.detail;
+        } else if (Array.isArray(errorData.detail)) {
+          // Handle Pydantic validation errors (array of error objects)
+          errorMessage = errorData.detail.map((err: any) => err.msg).join(', ');
+        } else if (typeof errorData.detail === 'object') {
+          // Handle single error object
+          errorMessage = errorData.detail.msg || JSON.stringify(errorData.detail);
+        }
+      }
+      setError(errorMessage);
     }
   };
 

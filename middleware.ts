@@ -88,13 +88,13 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
       response.cookies.set('accessToken', newAccessToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict',
+        sameSite: 'lax',
         maxAge: 15 * 60, // 15 minutes
       });
       response.cookies.set('refreshToken', newRefreshToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict',
+        sameSite: 'lax',
         maxAge: 7 * 24 * 60 * 60, // 7 days
       });
       response.headers.set('x-user', JSON.stringify(user));
