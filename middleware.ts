@@ -54,7 +54,8 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
       const refreshResponse = await fetch(`${API_ENDPOINT}/refresh`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ refresh_token: refreshToken }), // Fixed key name
+        body: JSON.stringify({ refresh_token: refreshToken }),
+        credentials: 'include', // Include cookies in the request and response
       });
 
       if (!refreshResponse.ok) {
@@ -68,7 +69,14 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
       const { user } = await refreshResponse.json();
       const response = NextResponse.next();
       response.headers.set('x-user', JSON.stringify(user));
-      return response; // Rely on FastAPI's Set-Cookie headers
+
+      // Forward Set-Cookie headers
+      const setCookieHeader = refreshResponse.headers.get('set-cookie');
+      if (setCookieHeader) {
+        response.headers.set('set-cookie', setCookieHeader);
+      }
+
+      return response;
     } catch (error) {
       console.error('Refresh Token Verification Error:', error);
       return NextResponse.redirect(new URL('/login', request.url));

@@ -18,7 +18,6 @@ export default function Login() {
       return;
     }
 
-    console.log('API Endpoint:', API_ENDPOINT);
     const res = await fetch(`${API_ENDPOINT}/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -26,7 +25,6 @@ export default function Login() {
       credentials: 'include',
     });
 
-    console.log('Set-Cookie Headers:', res.headers.get('set-cookie'));
     if (res.ok) {
       window.location.href = '/';
     } else {
